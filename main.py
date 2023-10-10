@@ -161,7 +161,7 @@ class GUI:
         ender = torch.cuda.Event(enable_timing=True)
         starter.record()
 
-        for _ in range(self.train_steps):
+        for step_i in range(self.train_steps):
 
             self.step += 1
             step_ratio = min(1, self.step / self.opt.iters)
@@ -195,7 +195,7 @@ class GUI:
 
                 # render random view
                 ver = np.random.randint(min_ver, max_ver)
-                hor = np.random.randint(-180, 180)
+                hor = -180 + 360 / self.train_steps * step_i
                 radius = 0
 
                 vers.append(ver)
@@ -853,8 +853,8 @@ class GUI:
     # no gui mode
     def train(self, iters=500):
     
-        
         print(f"batch_size: {self.opt.batch_size}, iters: {opt.iters}, train_step: {self.train_steps}")
+        
         if iters > 0:
             self.prepare_train()
             for i in tqdm.trange(iters):
