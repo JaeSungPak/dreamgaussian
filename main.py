@@ -852,6 +852,9 @@ class GUI:
     
     # no gui mode
     def train(self, iters=500):
+    
+        
+        print(f"batch_size: {self.opt.batch_size}, iters: {opt.iters}, train_step: {self.train_steps}")
         if iters > 0:
             self.prepare_train()
             for i in tqdm.trange(iters):
@@ -873,8 +876,6 @@ if __name__ == "__main__":
 
     # override default config from cli
     opt = OmegaConf.merge(OmegaConf.load(args.config), OmegaConf.from_cli(extras))
-
-    print(f"batch_size: {self.opt.batch_size}, iters: {opt.iters}, train_step: {self.train_steps}")
 
     gui = GUI(opt)
 
