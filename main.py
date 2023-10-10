@@ -156,12 +156,12 @@ class GUI:
             if self.enable_zero123:
                 self.guidance_zero123.get_img_embeds(self.input_img_torch)
 
-    def train_step(self):
+    def train_step(self, iter_num):
         starter = torch.cuda.Event(enable_timing=True)
         ender = torch.cuda.Event(enable_timing=True)
         starter.record()
 
-        for step_i in range(self.train_steps):
+        for _ in range(self.train_steps):
 
             self.step += 1
             step_ratio = min(1, self.step / self.opt.iters)
@@ -191,11 +191,12 @@ class GUI:
             # avoid too large elevation (> 80 or < -80), and make sure it always cover [-30, 30]
             min_ver = max(min(-30, -30 - self.opt.elevation), -80 - self.opt.elevation)
             max_ver = min(max(30, 30 - self.opt.elevation), 80 - self.opt.elevation)
+            
             for _ in range(self.opt.batch_size):
 
                 # render random view
                 ver = np.random.randint(min_ver, max_ver)
-                hor = 180 - 360 / self.train_steps * step_i
+                hor = 180 - 360 / self.train_steps * iter_num
                 radius = 0
 
                 vers.append(ver)
@@ -858,7 +859,7 @@ class GUI:
         if iters > 0:
             self.prepare_train()
             for i in tqdm.trange(iters):
-                self.train_step()
+                self.train_step(i)
             # do a last prune
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
         # save
