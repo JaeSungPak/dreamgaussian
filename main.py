@@ -874,6 +874,8 @@ if __name__ == "__main__":
     # override default config from cli
     opt = OmegaConf.merge(OmegaConf.load(args.config), OmegaConf.from_cli(extras))
 
+    print(f"batch_size: {self.opt.batch_size}, iters: {opt.iters}, train_step: {self.train_steps}")
+
     gui = GUI(opt)
 
     if opt.gui:
