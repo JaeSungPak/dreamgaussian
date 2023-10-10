@@ -195,7 +195,7 @@ class GUI:
 
                 # render random view
                 ver = np.random.randint(min_ver, max_ver)
-                hor = -180 + 360 / self.train_steps * step_i
+                hor = 180 - 360 / self.train_steps * step_i
                 radius = 0
 
                 vers.append(ver)
