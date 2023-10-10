@@ -156,7 +156,7 @@ class GUI:
             if self.enable_zero123:
                 self.guidance_zero123.get_img_embeds(self.input_img_torch)
 
-    def train_step(self, iter_num):
+    def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
         ender = torch.cuda.Event(enable_timing=True)
         starter.record()
@@ -860,7 +860,7 @@ class GUI:
         if iters > 0:
             self.prepare_train()
             for i in tqdm.trange(iters):
-                self.train_step(i)
+                self.train_step(i, iters)
             # do a last prune
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
         # save
