@@ -196,7 +196,7 @@ class GUI:
 
                 # render random view
                 ver = np.random.randint(min_ver, max_ver)
-                hor = 180 - 360 / iters * iter_num
+                hor = 360 / iters * (iter_num // 4)+ (iter_num % 4) * 90
                 radius = 0
 
                 vers.append(ver)
