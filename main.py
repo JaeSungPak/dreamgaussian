@@ -24,7 +24,7 @@ class GUI:
         self.H = opt.H
         self.cam = OrbitCamera(opt.W, opt.H, r=opt.radius, fovy=opt.fovy)
 
-        self.mode = "image"
+        self.mode = "depth"
         self.seed = "77777"
 
         self.buffer_image = np.ones((self.W, self.H, 3), dtype=np.float32)
