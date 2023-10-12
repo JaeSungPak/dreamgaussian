@@ -806,7 +806,7 @@ class Renderer:
             cov3D_precomp=cov3D_precomp,
         )
         
-        print("depth: ", rendered_depth)
+        print("depth: ", rendered_depth.shape)
 
         rendered_image = rendered_image.clamp(0, 1)
 
