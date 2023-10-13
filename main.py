@@ -174,7 +174,7 @@ class GUI:
             ### known view
             if self.input_img_torch is not None:
                 cur_cam = self.fixed_cam
-                out = self.renderer.render(cur_cam)
+                out = self.renderer.render(cur_cam, iter_num)
 
                 # rgb loss
                 image = out["image"].unsqueeze(0) # [1, 3, H, W] in [0, 1]

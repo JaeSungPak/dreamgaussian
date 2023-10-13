@@ -16,6 +16,7 @@ from simple_knn._C import distCUDA2
 from sh_utils import eval_sh, SH2RGB, RGB2SH
 from mesh import Mesh
 from mesh_utils import decimate_mesh, clean_mesh
+from torchvision.utils import save_image
 
 import kiui
 
@@ -715,6 +716,7 @@ class Renderer:
     def render(
         self,
         viewpoint_camera,
+        iter,
         scaling_modifier=1.0,
         invert_bg_color=False,
         override_color=None,
@@ -807,8 +809,11 @@ class Renderer:
         )
         
         #rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
-        print(f"max img: {rendered_image}")
-        print(f"max dpt: {rendered_depth}")
+        #print(f"max img: {rendered_image}")
+        # print(f"max dpt: {rendered_depth}")
+
+        save_image(rendered_image, f"logs/img_{iter}.png")
+        save_image(rendered_depth, f"logs/depth_{iter}.png")
 
         rendered_image = rendered_image.clamp(0, 1)
 
