@@ -22,7 +22,8 @@ from torchvision.utils import save_image
 class Zero123(nn.Module):
     def __init__(self, device, fp16=True, t_range=[0.02, 0.98]):
         super().__init__()
-
+        
+        self.step = 0
         self.device = device
         self.fp16 = fp16
         self.dtype = torch.float16 if fp16 else torch.float32
@@ -167,6 +168,8 @@ class Zero123(nn.Module):
         save_image(self.decode_latents(latents), f"data/alpha_{self.step}.png")
         
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
+        
+        self.step = self.step + 1
 
         return loss
     
