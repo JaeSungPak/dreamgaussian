@@ -806,7 +806,7 @@ class Renderer:
             cov3D_precomp=cov3D_precomp,
         )
         
-        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1))
+        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
 
         rendered_image = rendered_image.clamp(0, 1)
 
