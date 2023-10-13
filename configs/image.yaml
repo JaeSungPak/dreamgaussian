@@ -24,7 +24,7 @@ lambda_zero123: 1
 # training batch size per iter
 batch_size: 1
 # training iterations for stage 1
-iters: 500
+iters: 5000
 # training iterations for stage 2
 iters_refine: 50
 # training camera radius
@@ -47,7 +47,7 @@ H: 800
 W: 800
 
 ### Gaussian splatting
-num_pts: 1000
+num_pts: 5000
 sh_degree: 0
 position_lr_init: 0.001
 position_lr_final: 0.00002
