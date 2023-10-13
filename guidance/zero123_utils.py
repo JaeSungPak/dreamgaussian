@@ -112,15 +112,6 @@ class Zero123(nn.Module):
 
         imgs = self.decode_latents(latents) # [1, 3, 256, 256]
         return imgs
-        
-    
-    def decode_latents(self, latents):
-        latents = 1 / self.vae.config.scaling_factor * latents
-
-        imgs = self.vae.decode(latents).sample
-        imgs = (imgs / 2 + 0.5).clamp(0, 1)
-
-        return imgs
     
     def train_step(self, pred_rgb, polar, azimuth, radius, step_ratio=None, guidance_scale=5, as_latent=False):
         # pred_rgb: tensor [1, 3, H, W] in [0, 1]
@@ -173,11 +164,20 @@ class Zero123(nn.Module):
 
         target = (latents - grad).detach()
         
-        save_image(decode_latents(target), f"data/alpha_{self.step}.png")
+        save_image(decode_latents(latents), f"data/alpha_{self.step}.png")
         
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
 
         return loss
+    
+
+    def decode_latents(self, latents):
+        latents = 1 / self.vae.config.scaling_factor * latents
+
+        imgs = self.vae.decode(latents).sample
+        imgs = (imgs / 2 + 0.5).clamp(0, 1)
+
+        return imgs
 
     def encode_imgs(self, imgs, mode=False):
         # imgs: [B, 3, H, W]
