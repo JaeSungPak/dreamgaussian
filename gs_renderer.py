@@ -822,7 +822,7 @@ class Renderer:
 #            save_image(rendered_depth, f"data/depth_{iter}.png")
 #            save_image(rendered_alpha, f"data/alpha_{iter}.png")
         
-        print("xyz: ", self.gaussians.get_xyz.shape)
+        #print("xyz: ", self.gaussians.get_xyz.shape)
         
         rendered_image = rendered_image.clamp(0, 1)
 
