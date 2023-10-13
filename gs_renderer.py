@@ -812,8 +812,8 @@ class Renderer:
         #print(f"max img: {rendered_image}")
         # print(f"max dpt: {rendered_depth}")
 
-        save_image(rendered_image, f"logs/img_{iter}.png")
-        save_image(rendered_depth, f"logs/depth_{iter}.png")
+        save_image(rendered_image, f"data/img_{iter}.png")
+        save_image(rendered_depth, f"data/depth_{iter}.png")
 
         rendered_image = rendered_image.clamp(0, 1)
 
