@@ -806,7 +806,9 @@ class Renderer:
             cov3D_precomp=cov3D_precomp,
         )
         
-        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1) / 100
+        #rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
+        print(f"max img: {rendered_image}")
+        print(f"max dpt: {rendered_depth}")
 
         rendered_image = rendered_image.clamp(0, 1)
 
