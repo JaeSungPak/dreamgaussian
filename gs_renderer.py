@@ -793,7 +793,7 @@ class Renderer:
                 shs = self.gaussians.get_features
         else:
             colors_precomp = override_color
-
+        
         # Rasterize visible Gaussians to image, obtain their radii (on screen).
         rendered_image, radii, rendered_depth, rendered_alpha = rasterizer(
             means3D=means3D,
