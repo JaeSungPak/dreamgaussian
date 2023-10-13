@@ -807,7 +807,7 @@ class Renderer:
         )
        
         print("image: ", rendered_image.shape)
-        # print("depth: ", rendered_depth.shape)
+        print("depth: ", rendered_depth.shape)
 
         rendered_image = rendered_image.clamp(0, 1)
 
