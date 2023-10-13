@@ -164,7 +164,7 @@ class Zero123(nn.Module):
 
         target = (latents - grad).detach()
         
-        save_image(decode_latents(latents), f"data/alpha_{self.step}.png")
+        save_image(decode_latents(latents.float()), f"data/alpha_{self.step}.png")
         
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
 
