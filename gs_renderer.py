@@ -805,9 +805,9 @@ class Renderer:
             rotations=rotations,
             cov3D_precomp=cov3D_precomp,
         )
-       
+        
         print("image: ", rendered_image.shape)
-        print("depth: ", (torch.stack([rendered_depth,rendered_depth,rendered_depth],dim=0)).shape)
+        print("depth: ", (rendered_depth.expand(0, 3)).shape)
 
         rendered_image = rendered_image.clamp(0, 1)
 
