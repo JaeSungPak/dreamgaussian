@@ -814,7 +814,7 @@ class Renderer:
 #        print(f"rad: {radii.shape}")
 #        print(f"alp: {rendered_alpha.shape}")
         
-        if iter >= 0:
+        if iter >= 0 and iter % 10 == 0:
             save_image(rendered_image, f"data/img_{iter}.png")
             save_image(rendered_depth, f"data/depth_{iter}.png")
             save_image(rendered_alpha, f"data/alpha_{iter}.png")
