@@ -733,6 +733,9 @@ class Renderer:
             )
             + 0
         )
+        
+        
+        
         try:
             screenspace_points.retain_grad()
         except:
@@ -818,7 +821,9 @@ class Renderer:
 #            save_image(rendered_image, f"data/img_{iter}.png")
 #            save_image(rendered_depth, f"data/depth_{iter}.png")
 #            save_image(rendered_alpha, f"data/alpha_{iter}.png")
-
+        
+        print("xyz: ", self.gaussians.get_xyz.shape)
+        
         rendered_image = rendered_image.clamp(0, 1)
 
         # Those Gaussians that were frustum culled or had a radius of 0 were not visible.
