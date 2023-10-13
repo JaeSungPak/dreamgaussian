@@ -16,6 +16,7 @@ import sys
 sys.path.append('./')
 
 from zero123 import Zero123Pipeline
+from torchvision.utils import save_image
 
 
 class Zero123(nn.Module):
