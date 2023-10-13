@@ -809,12 +809,15 @@ class Renderer:
         )
         
         #rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
-        #print(f"max img: {rendered_image}")
-        # print(f"max dpt: {rendered_depth}")
+        print(f"img: {rendered_image.shape}")
+        print(f"dpt: {rendered_depth.shape}")
+        print(f"rad: {radii.shape}")
+        print(f"alp: {rendered_alpha.shape}")
         
-        if iter >= 0:
-            save_image(rendered_image, f"data/img_{iter}.png")
-            save_image(rendered_depth, f"data/depth_{iter}.png")
+#        if iter >= 0:
+#            save_image(rendered_image, f"data/img_{iter}.png")
+#            save_image(rendered_depth, f"data/depth_{iter}.png")
+#            save_image(rendered_depth, f"data/depth_{iter}.png")
 
         rendered_image = rendered_image.clamp(0, 1)
 
