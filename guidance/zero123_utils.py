@@ -165,7 +165,7 @@ class Zero123(nn.Module):
 
         target = (latents - grad).detach()
         
-        save_image(self.decode_latents(target.to(torch.float16)), f"data/alpha_{self.step}.png")
+        save_image(self.decode_latents(target.to(torch.float16)), f"data/zero_render_{self.step}.png")
         
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
         

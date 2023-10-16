@@ -812,13 +812,6 @@ class Renderer:
             cov3D_precomp=cov3D_precomp,
         )
         
-        print(f"means3D: {means3D.shape}")
-        print(f"means2D: {means2D.shape}")
-        print(f"shs: {shs.shape}")
-        print(f"opacities: {opacity.shape}")
-        print(f"scales: {scales.shape}")
-        print(f"rotations: {rotations.shape}")
-        
 #        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
 #        print(f"img: {rendered_image.shape}")
 #        print(f"dpt: {rendered_depth.shape}")
