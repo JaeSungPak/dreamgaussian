@@ -7,6 +7,8 @@ from diffusers import (
     StableDiffusionPipeline,
 )
 from diffusers.utils.import_utils import is_xformers_available
+from torchvision.utils import save_image
+
 
 # suppress partial model loading warning
 logging.set_verbosity_error()
@@ -36,6 +38,7 @@ class StableDiffusion(nn.Module):
     ):
         super().__init__()
 
+        self.step = 0
         self.device = device
         self.sd_version = sd_version
 
@@ -190,6 +193,11 @@ class StableDiffusion(nn.Module):
         # grad = grad.clamp(-1, 1)
 
         target = (latents - grad).detach()
+        
+        save_image(self.decode_latents(target.to(torch.float16)), f"data/alpha_{self.step}.png")
+        
+        self.step = self.step + 1
+        
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum') / latents.shape[0]
 
         return loss
