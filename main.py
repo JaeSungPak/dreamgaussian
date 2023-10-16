@@ -848,6 +848,10 @@ class GUI:
             # update texture every frame
             if self.training:
                 self.train_step()
+                
+            import moviepy.editor as mpy
+            clip = mpy.ImageSequenceClip(self.guidance_zero123.frames,fps=10)
+            clip.write_videofile("compare.mp4",fps=10)
             self.test_step()
             dpg.render_dearpygui_frame()
     
