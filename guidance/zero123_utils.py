@@ -178,7 +178,7 @@ class Zero123(nn.Module):
         latents_ = latents.type(torch.HalfTensor).cuda()
         l_img = self.decode_latents(latents_)
         ln_img = self.decode_latents(latents_noisy.type(torch.HalfTensor).cuda())
-        self.frames.append(np.array(T.ToPILImage()(torch.cat((l_img.detach()[0].cpu(),ln_img.detach()[0].cpu(),t_img.detach()[0].cpu()),2))))
+        self.frames.append(np.array(transforms.ToPILImage()(torch.cat((l_img.detach()[0].cpu(),ln_img.detach()[0].cpu(),t_img.detach()[0].cpu()),2))))
 
         return loss
     
