@@ -864,6 +864,9 @@ class GUI:
             self.prepare_train()
             for i in tqdm.trange(iters):
                 self.train_step(i, iters)
+            import moviepy.editor as mpy
+            clip = mpy.ImageSequenceClip(self.guidance_zero123.frames,fps=10)
+            clip.write_videofile("compare.mp4",fps=10)
             # do a last prune
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
         # save
