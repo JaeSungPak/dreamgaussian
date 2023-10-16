@@ -24,6 +24,7 @@ class Zero123(nn.Module):
         super().__init__()
         
         self.step = 0
+        self.frames = []
         self.device = device
         self.fp16 = fp16
         self.dtype = torch.float16 if fp16 else torch.float32
