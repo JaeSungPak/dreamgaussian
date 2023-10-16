@@ -170,13 +170,6 @@ class Zero123(nn.Module):
         
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
         
-        target_ = target.type(torch.HalfTensor).cuda()
-        t_img = self.decode_latents(target_)
-        latents_ = latents.type(torch.HalfTensor).cuda()
-        l_img = self.decode_latents(latents_)
-        ln_img = self.decode_latents(latents_noisy.type(torch.HalfTensor).cuda())
-        self.frames.append(np.array(T.ToPILImage()(torch.cat((l_img.detach()[0].cpu(),ln_img.detach()[0].cpu(),t_img.detach()[0].cpu()),2))))
-        
         self.step = self.step + 1
 
         return loss
