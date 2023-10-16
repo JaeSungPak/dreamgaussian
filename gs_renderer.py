@@ -64,7 +64,8 @@ def strip_symmetric(sym):
 
 def gaussian_3d_coeff(xyzs, covs):
     # xyzs: [N, 3]
-    # covs: [N, 6]
+    # covs: [N, 6]Evaluation Settings. We adopt the CLIP-similarity metric (Melas-Kyriazi et al., 2023; Qian et al., 2023; Liu et al., 2023a) to evaluate the image-to-3D quality. A dataset of 30 images collected from previous works (Melas-Kyriazi et al., 2023; Liu et al., 2023a; Tang et al., 2023b; Liu et al., 2023c) and Internet covering various objects is used. We then render 8 views with uniformly sampled azimuth angles [0, 45, 90, 135, 180, 225, 270, 315] and zero elevation angle. These rendered images are used to calculate the CLIP similarities with the reference view, and we average the different views for the final metric. We use the laion/CLIP-ViT-bigG-14-laion2B-39B-b160k1 checkpoint to calculate CLIP similarity. For the user study, we render 360 degree rotating videos of 3D models generated from a collection of 15 images. There are in total 60 videos for 4 methods (Zero-1-to-3 (Liu et al., 2023b), One-2-3-45 Liu et al. (2023a), Shap-E Jun & Nichol (2023), and our method) to evaluate. Each volunteer is shown 15 samples containing the input image and a rendered video from a random method, and ask them to rate in two aspects: reference view consistency and overall model quality. We collect results from 40 volunteers and get 600 valid scores in total.
+
     x, y, z = xyzs[:, 0], xyzs[:, 1], xyzs[:, 2]
     a, b, c, d, e, f = covs[:, 0], covs[:, 1], covs[:, 2], covs[:, 3], covs[:, 4], covs[:, 5]
 
@@ -810,6 +811,8 @@ class Renderer:
             rotations=rotations,
             cov3D_precomp=cov3D_precomp,
         )
+        
+        print(f"Color{colors_precomp.shape}")
         
 #        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
 #        print(f"img: {rendered_image.shape}")
