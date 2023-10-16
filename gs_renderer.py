@@ -812,7 +812,7 @@ class Renderer:
             cov3D_precomp=cov3D_precomp,
         )
         
-        print(f"Color{colors_precomp.shape}")
+        print(f"Color{colors_precomp}")
         
 #        rendered_image = rendered_image - rendered_depth.expand(3, -1, -1)
 #        print(f"img: {rendered_image.shape}")
