@@ -20,6 +20,8 @@ from torchvision.utils import save_image
 
 import kiui
 
+writer = SummaryWriter('lr/')
+
 def inverse_sigmoid(x):
     return torch.log(x/(1-x))
 
@@ -381,6 +383,7 @@ class GaussianModel:
             if param_group["name"] == "xyz":
                 lr = self.xyz_scheduler_args(iteration)
                 param_group['lr'] = lr
+                writer.add_scalar("lr/position", lr, iteration)
                 return lr
 
     def construct_list_of_attributes(self):

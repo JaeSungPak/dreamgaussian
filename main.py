@@ -888,6 +888,7 @@ class GUI:
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
             
             writer.close()
+            self.renderer.writer.close();
         # save
         self.save_model(mode='model')
         self.save_model(mode='geo+tex')
