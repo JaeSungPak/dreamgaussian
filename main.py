@@ -187,7 +187,7 @@ class GUI:
                 
                 loss = loss + loss_image
                 
-                writer.add_scalar("Loss/image", loss_image, i)
+                writer.add_scalar("Loss/image", loss_image, iter_num)
                 
 
                 # mask loss
