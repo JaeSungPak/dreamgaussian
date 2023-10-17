@@ -15,6 +15,10 @@ from gs_renderer import Renderer, MiniCam
 
 from grid_put import mipmap_linear_grid_put_2d
 from mesh import Mesh, safe_normalize
+from torch.utils.tensorboard import SummaryWriter
+
+        
+writer = SummaryWriter('scalar/')
 
 class GUI:
     def __init__(self, opt):
@@ -178,11 +182,22 @@ class GUI:
 
                 # rgb loss
                 image = out["image"].unsqueeze(0) # [1, 3, H, W] in [0, 1]
-                loss = loss + 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
+                
+                loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
+                
+                loss = loss + loss_image
+                
+                writer.add_scalar("Loss/image", loss_image, i)
+                
 
                 # mask loss
                 mask = out["alpha"].unsqueeze(0) # [1, 1, H, W] in [0, 1]
-                loss = loss + 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
+                
+                loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
+                
+                loss = loss + loss_alpha
+                
+                writer.add_scalar("Loss/alpha", loss_alpha, i)
 
             ### novel view (manual batch)
             render_resolution = 128 if step_ratio < 0.3 else (256 if step_ratio < 0.6 else 512)
@@ -869,6 +884,8 @@ class GUI:
             clip.write_videofile("compare.mp4",fps=10)
             # do a last prune
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
+            
+            writer.close()
         # save
         self.save_model(mode='model')
         self.save_model(mode='geo+tex')
