@@ -247,7 +247,9 @@ class GUI:
                 loss = loss + self.opt.lambda_sd * self.guidance_sd.train_step(images, step_ratio)
 
             if self.enable_zero123:
-                loss = loss + self.opt.lambda_zero123 * self.guidance_zero123.train_step(images, vers, hors, radii, step_ratio)
+                loss_sds = self.opt.lambda_zero123 * self.guidance_zero123.train_step(images, vers, hors, radii, step_ratio)
+                loss = loss + loss_sds
+                writer.add_scalar("Loss/sds", loss_sds, iter_num)
             
             # optimize step
             loss.backward()
