@@ -806,7 +806,7 @@ class Renderer:
             colors_precomp = override_color
         
         mean_min = means3D.min()
-        print(f"shape: {mean3D.shape}")
+        print(f"shape: {means3D.shape}")
         
         # Rasterize visible Gaussians to image, obtain their radii (on screen).
         rendered_image, radii, rendered_depth, rendered_alpha = rasterizer(
