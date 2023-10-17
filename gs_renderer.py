@@ -801,8 +801,12 @@ class Renderer:
                 colors_precomp = torch.clamp_min(sh2rgb + 0.5, 0.0)
             else:
                 shs = self.gaussians.get_features
+                
         else:
             colors_precomp = override_color
+            
+        print(f"shs: {shs.max()}, {shs.min()}")
+        print(f"means3D: {means3D.max()}, {means3d.min()}")
         
         # Rasterize visible Gaussians to image, obtain their radii (on screen).
         rendered_image, radii, rendered_depth, rendered_alpha = rasterizer(
