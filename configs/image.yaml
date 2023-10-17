@@ -47,21 +47,21 @@ H: 800
 W: 800
 
 ### Gaussian splatting
-num_pts: 5000
+num_pts: 10000
 sh_degree: 0
 position_lr_init: 0.001
-position_lr_final: 0.00005
+position_lr_final: 0.00002
 position_lr_delay_mult: 0.02
-position_lr_max_steps: 5000
+position_lr_max_steps: 500
 feature_lr: 0.01
 opacity_lr: 0.05
 scaling_lr: 0.005
 rotation_lr: 0.005
 percent_dense: 0.1
-density_start_iter: 1000
-density_end_iter: 30000
-densification_interval: 1000
-opacity_reset_interval: 7000
+density_start_iter: 100
+density_end_iter: 3000
+densification_interval: 100
+opacity_reset_interval: 700
 densify_grad_threshold: 0.5
 
 ### Textured Mesh
