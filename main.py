@@ -231,7 +231,7 @@ class GUI:
                 )
 
                 invert_bg_color = np.random.rand() > self.opt.invert_bg_prob
-                out = self.renderer.render(cur_cam, iter_num, invert_bg_color=True)
+                out = self.renderer.render(cur_cam, iter_num, invert_bg_color=invert_bg_color)
 
                 image = out["image"].unsqueeze(0)# [1, 3, H, W] in [0, 1]
                 images.append(image)
