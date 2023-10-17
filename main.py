@@ -197,7 +197,7 @@ class GUI:
                 
                 loss = loss + loss_alpha
                 
-                writer.add_scalar("Loss/alpha", loss_alpha, i)
+                writer.add_scalar("Loss/alpha", loss_alpha, iter_num)
 
             ### novel view (manual batch)
             render_resolution = 128 if step_ratio < 0.3 else (256 if step_ratio < 0.6 else 512)
