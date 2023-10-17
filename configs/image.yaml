@@ -52,7 +52,7 @@ sh_degree: 0
 position_lr_init: 0.001
 position_lr_final: 0.00003
 position_lr_delay_mult: 0.02
-position_lr_max_steps: 5000
+position_lr_max_steps: 500
 feature_lr: 0.01
 opacity_lr: 0.05
 scaling_lr: 0.005
