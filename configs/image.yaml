@@ -50,7 +50,7 @@ W: 800
 num_pts: 5000
 sh_degree: 0
 position_lr_init: 0.001
-position_lr_final: 0.00003
+position_lr_final: 0.00002
 position_lr_delay_mult: 0.02
 position_lr_max_steps: 500
 feature_lr: 0.01
