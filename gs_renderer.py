@@ -19,6 +19,7 @@ from mesh_utils import decimate_mesh, clean_mesh
 from torchvision.utils import save_image
 
 import kiui
+from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter('lr/')
 
