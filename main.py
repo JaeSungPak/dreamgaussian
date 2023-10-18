@@ -204,7 +204,7 @@ class GUI:
                 
                 # self.guidance_zero123.get_img_embeds(self.input_img_torch)
                 
-                loss_image_back = 3000 * step_ratio * F.mse_loss(image_back.float(), self.input_img_back.float())
+                loss_image_back = 10000 * step_ratio * F.mse_loss(image_back.float(), self.input_img_back.float())
                 
                 loss = loss + loss_image + loss_image_back
                 
