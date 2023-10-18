@@ -16,6 +16,7 @@ from gs_renderer import Renderer, MiniCam
 from grid_put import mipmap_linear_grid_put_2d
 from mesh import Mesh, safe_normalize
 from torch.utils.tensorboard import SummaryWriter
+from torchvision.utils import save_image
 
         
 writer = SummaryWriter('scalar/')
@@ -161,7 +162,7 @@ class GUI:
             self.guidance_zero123.get_img_embeds(self.input_img_torch)
             self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
             
-            save_image(self.input_img_back, "background.png")
+            save_image(self.input_img_back[0], "background.png")
 
             self.input_mask_torch = torch.from_numpy(self.input_mask).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_mask_torch = F.interpolate(self.input_mask_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
