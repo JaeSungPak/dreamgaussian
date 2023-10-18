@@ -119,7 +119,7 @@ class GUI:
 
         # default camera
         pose = orbit_camera(self.opt.elevation, 0, self.opt.radius)
-        pose_back = orbit_camera(self.opt.elevation + 180, 0, self.opt.radius)
+        pose_back = orbit_camera(self.opt.elevation, 180, self.opt.radius)
         self.fixed_cam = MiniCam(
             pose,
             self.opt.ref_size,
