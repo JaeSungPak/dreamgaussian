@@ -176,7 +176,6 @@ class GUI:
                 self.input_img_back = F.interpolate(self.input_img_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
                 self.input_mask_back = self.input_img_back[..., 3:]
                 self.input_mask_back = F.interpolate(self.input_mask_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
-                print(f"mask back: {self.input_img_back.shape}")
 
     def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
@@ -398,7 +397,6 @@ class GUI:
         img = cv2.resize(img, (self.W, self.H), interpolation=cv2.INTER_AREA)
         img = img.astype(np.float32) / 255.0
         
-        print(f"mask img: {img.shape}")
         self.input_mask = img[..., 3:]
         # white bg
         self.input_img = img[..., :3] * self.input_mask + (1 - self.input_mask)
