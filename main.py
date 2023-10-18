@@ -175,7 +175,6 @@ class GUI:
                 self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
                 self.input_img_back = F.interpolate(self.input_img_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
                 self.input_mask_back = self.input_img_back[..., 3:]
-                self.input_mask_back = torch.from_numpy(self.input_mask_back).permute(2, 0, 1).unsqueeze(0).to(self.device)
                 self.input_mask_back = F.interpolate(self.input_mask_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
 
     def train_step(self, iter_num, iters):
