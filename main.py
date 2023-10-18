@@ -172,7 +172,7 @@ class GUI:
             if self.enable_zero123:
                 self.guidance_zero123.get_img_embeds(self.input_img_torch)
                 self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
-                self.input_img_back = F.interpolate(self.input_img_back, (512, 512), mode="bilinear", align_corners=False)
+                self.input_img_back = F.interpolate(self.input_img_back, (256, 256), mode="bilinear", align_corners=False)
 
     def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
