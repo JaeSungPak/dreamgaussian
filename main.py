@@ -222,7 +222,7 @@ class GUI:
                 
                 loss_alpha_back = 1000 * step_ratio * F.mse_loss(mask_back.float(), self.input_mask_back.float())
                 
-                loss = loss + loss_alpha + loss_alpha_back
+                loss = loss + loss_alpha
                 
                 writer.add_scalar("Loss/alpha", loss_alpha, iter_num)
 
