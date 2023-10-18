@@ -159,7 +159,6 @@ class GUI:
         if self.input_img is not None:
             self.input_img_torch = torch.from_numpy(self.input_img).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_img_torch = F.interpolate(self.input_img_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
-            
 
             self.input_mask_torch = torch.from_numpy(self.input_mask).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_mask_torch = F.interpolate(self.input_mask_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
@@ -201,7 +200,7 @@ class GUI:
                 
                 loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
                 
-                self.guidance_zero123.get_img_embeds(self.input_img_torch)
+                # self.guidance_zero123.get_img_embeds(self.input_img_torch)
                 self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
                 
                 loss_image_back = 3000 * step_ratio * F.mse_loss(image_back, self.input_img_back)
