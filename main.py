@@ -204,10 +204,11 @@ class GUI:
                 
                 loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
                 
-                loss = loss + loss_image
+                loss_image_back = 3000 * step_ratio * F.mse_loss(image_back, self.input_img_back)
+                
+                loss = loss + loss_image + loss_image_back
                 
                 writer.add_scalar("Loss/image", loss_image, iter_num)
-                
 
                 # mask loss
                 mask = out["alpha"].unsqueeze(0) # [1, 1, H, W] in [0, 1]
