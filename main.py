@@ -158,9 +158,8 @@ class GUI:
         if self.input_img is not None:
             self.input_img_torch = torch.from_numpy(self.input_img).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_img_torch = F.interpolate(self.input_img_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
-            image_interpolate = F.interpolate(self.input_img_torch, (256, 256), mode='bilinear', align_corners=False)
-            self.input_img_back = self.guidance_zero123.pipe._encode_image(image_interpolate, 180, 0, 0, self.device, 1, False)
-            self.input_img_back = self.guidance_zero123.pipe.decode_latents(self.input_img_back)
+            #self.input_img_back = self.guidance_zero123.pipe._encode_image(self.input_img_torch, 180, 0, 0, self.device, 1, False)
+            #self.input_img_back = self.guidance_zero123.pipe.decode_latents(self.input_img_back)
             
             print(f"zero123: {self.input_img_back.shape}")
 
