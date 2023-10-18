@@ -182,51 +182,6 @@ class Zero123(nn.Module):
 
         return loss
         
-    def back_image(self, pred_rgb, polar, azimuth, radius, guidance_scale=5):
-        # pred_rgb: tensor [1, 3, H, W] in [0, 1]
-
-        batch_size = pred_rgb.shape[0]
-        
-        pred_rgb_256 = F.interpolate(pred_rgb, (256, 256), mode='bilinear', align_corners=False)
-        latents = self.encode_imgs(pred_rgb_256.to(self.dtype))
-
-        t = np.round((1) * self.num_train_timesteps).clip(0, 0)
-        t = torch.full((batch_size,), t, dtype=torch.long, device=self.device)
-      
-        w = (1 - self.alphas[t]).view(batch_size, 1, 1, 1)
-
-        with torch.no_grad():
-            noise = torch.randn_like(latents)
-            latents_noisy = self.scheduler.add_noise(latents, noise, t)
-
-            x_in = torch.cat([latents_noisy] * 2)
-            t_in = torch.cat([t] * 2)
-
-            T = np.stack([np.deg2rad(polar), np.sin(np.deg2rad(azimuth)), np.cos(np.deg2rad(azimuth)), radius], axis=-1)
-            T = torch.from_numpy(T).unsqueeze(1).to(self.dtype).to(self.device) # [8, 1, 4]
-            cc_emb = torch.cat([self.embeddings[0].repeat(batch_size, 1, 1), T], dim=-1)
-            cc_emb = self.pipe.clip_camera_projection(cc_emb)
-            cc_emb = torch.cat([cc_emb, torch.zeros_like(cc_emb)], dim=0)
-
-            vae_emb = self.embeddings[1].repeat(batch_size, 1, 1, 1)
-            vae_emb = torch.cat([vae_emb, torch.zeros_like(vae_emb)], dim=0)
-
-            noise_pred = self.unet(
-                torch.cat([x_in, vae_emb], dim=1),
-                t_in.to(self.unet.dtype),
-                encoder_hidden_states=cc_emb,
-            ).sample
-
-        noise_pred_cond, noise_pred_uncond = noise_pred.chunk(2)
-        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_cond - noise_pred_uncond)
-
-        grad = w * (noise_pred - noise)
-        grad = torch.nan_to_num(grad)
-
-        target = (latents - grad).detach()
-
-        return self.decode_latents(target.to(torch.float16))
-    
 
     def decode_latents(self, latents):
         latents = 1 / self.vae.config.scaling_factor * latents
