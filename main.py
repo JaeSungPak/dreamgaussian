@@ -52,6 +52,7 @@ class GUI:
         # input image
         self.input_img = None
         self.input_mask = None
+        self.input_mask_back = None
         self.input_img_torch = None
         self.input_img_back = None
         self.input_mask_torch = None
@@ -173,6 +174,9 @@ class GUI:
                 self.guidance_zero123.get_img_embeds(self.input_img_torch)
                 self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
                 self.input_img_back = F.interpolate(self.input_img_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
+                self.input_mask_back = self.input_img_back[..., 3:]
+                self.input_mask_back = torch.from_numpy(self.input_mask_back).permute(2, 0, 1).unsqueeze(0).to(self.device)
+                self.input_mask_back = F.interpolate(self.input_mask_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
 
     def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
@@ -212,6 +216,9 @@ class GUI:
 
                 # mask loss
                 mask = out["alpha"].unsqueeze(0) # [1, 1, H, W] in [0, 1]
+                mask = out_back["alpha"].unsqueeze(0)
+                
+                loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
                 
                 loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
                 
