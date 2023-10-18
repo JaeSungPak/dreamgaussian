@@ -52,6 +52,7 @@ class GUI:
         self.input_img = None
         self.input_mask = None
         self.input_img_torch = None
+        self.input_img_back = None
         self.input_mask_torch = None
         self.overlay_input_img = False
         self.overlay_input_img_ratio = 0.5
@@ -117,8 +118,18 @@ class GUI:
 
         # default camera
         pose = orbit_camera(self.opt.elevation, 0, self.opt.radius)
+        pose_back = orbit_camera(self.opt.elevation + 180, 0, self.opt.radius)
         self.fixed_cam = MiniCam(
             pose,
+            self.opt.ref_size,
+            self.opt.ref_size,
+            self.cam.fovy,
+            self.cam.fovx,
+            self.cam.near,
+            self.cam.far,
+        )
+        self.fixed_cam_back = MiniCam(
+            pose_back,
             self.opt.ref_size,
             self.opt.ref_size,
             self.cam.fovy,
@@ -147,6 +158,10 @@ class GUI:
         if self.input_img is not None:
             self.input_img_torch = torch.from_numpy(self.input_img).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_img_torch = F.interpolate(self.input_img_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
+            self.input_img_back = self.guidance_zero123.self.pipe._encode_image(self.input_img_torch, 180, 0, 0, self.device, 1, False)
+            self.input_img_back = self.guidance_zero123.self.pipe.decode_latents(self.input_img_back)
+            
+            print(f"zero123: {self.input_img_back.shape}")
 
             self.input_mask_torch = torch.from_numpy(self.input_mask).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_mask_torch = F.interpolate(self.input_mask_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
@@ -179,9 +194,12 @@ class GUI:
             if self.input_img_torch is not None:
                 cur_cam = self.fixed_cam
                 out = self.renderer.render(cur_cam)
+                back_cam = self.fixed_cam_back
+                out_back = self.renderer.render(back_cam)
 
                 # rgb loss
                 image = out["image"].unsqueeze(0) # [1, 3, H, W] in [0, 1]
+                image_back = out_back["image"].unsqueeze(0)
                 
                 loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
                 
