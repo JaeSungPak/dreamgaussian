@@ -220,9 +220,9 @@ class GUI:
                 
                 loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
                 
-                loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
+                loss_alpha_back = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_back)
                 
-                loss = loss + loss_alpha
+                loss = loss + loss_alpha + loss_alpha_back
                 
                 writer.add_scalar("Loss/alpha", loss_alpha, iter_num)
 
