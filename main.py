@@ -201,14 +201,14 @@ class GUI:
 
                 # rgb loss
                 image = out["image"].unsqueeze(0) # [1, 3, H, W] in [0, 1]
-                #image_back = out_back["image"].unsqueeze(0)
+                image_back = out_back["image"].unsqueeze(0)
                 
                 loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
                 
-                #loss_image_back = 10000 * step_ratio * F.mse_loss(image_back.float(), self.input_img_back.float())
+                loss_image_back = 10000 * step_ratio * F.mse_loss(image_back.float(), self.input_img_back.float())
                 
-                # loss = loss + loss_image + loss_image_back
-                loss = loss + loss_image
+                loss = loss + loss_image + loss_image_back
+                # loss = loss + loss_image
                 
                 writer.add_scalar("Loss/image", loss_image, iter_num)
 
