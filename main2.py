@@ -45,8 +45,11 @@ class GUI:
 
         # input image
         self.input_img = None
+        self.input_img_back = None
         self.input_mask = None
+        self.input_mask_back = None
         self.input_img_torch = None
+        self.input_img_torch_back = None
         self.input_mask_torch = None
         self.overlay_input_img = False
         self.overlay_input_img_ratio = 0.5
@@ -105,6 +108,9 @@ class GUI:
         pose = orbit_camera(self.opt.elevation, 0, self.opt.radius)
         self.fixed_cam = (pose, self.cam.perspective)
         
+        pose_back = orbit_camera(self.opt.elevation, 180, self.opt.radius)
+        self.fixed_cam_back = (pose_back, self.cam.perspective)
+        
 
         self.enable_sd = self.opt.lambda_sd > 0 and self.prompt != ""
         self.enable_zero123 = self.opt.lambda_zero123 > 0 and self.input_img is not None
@@ -134,6 +140,7 @@ class GUI:
                 self.input_mask_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False
             )
             self.input_img_torch_channel_last = self.input_img_torch[0].permute(1,2,0).contiguous()
+            self.input_img_torch_channel_last_back = self.input_img_torch_back[0].permute(1,2,0).contiguous()
 
         # prepare embeddings
         with torch.no_grad():
@@ -162,12 +169,17 @@ class GUI:
 
                 ssaa = min(2.0, max(0.125, 2 * np.random.random()))
                 out = self.renderer.render(*self.fixed_cam, self.opt.ref_size, self.opt.ref_size, ssaa=ssaa)
+                out_back = self.renderer.render(*self.fixed_cam_back, self.opt.ref_size, self.opt.ref_size, ssaa=ssaa)
 
                 # rgb
                 
                 image = out["image"] # [H, W, 3] in [0, 1]
+                image_back = out_back["image"]
+                
                 valid_mask = ((out["alpha"] > 0) & (out["viewcos"] > 0.5)).detach()
-                loss = loss + F.mse_loss(image * valid_mask, self.input_img_torch_channel_last * valid_mask)
+                valid_mask_back = ((out_back["alpha"] > 0) & (out_back["viewcos"] > 0.5)).detach()
+                
+                loss = loss + F.mse_loss(image * valid_mask, self.input_img_torch_channel_last * valid_mask) + F.mse_loss(image_back * valid_mask_back, self.input_img_torch_channel_last_back * valid_mask)
 
             ### novel view (manual batch)
             render_resolution = 512
@@ -293,23 +305,40 @@ class GUI:
         # load image
         print(f'[INFO] load image from {file}...')
         img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
+        img_back = cv2.imread("data/back.png", cv2.IMREAD_UNCHANGED)
+        
         if img.shape[-1] == 3:
             if self.bg_remover is None:
                 self.bg_remover = rembg.new_session()
             img = rembg.remove(img, session=self.bg_remover)
+            
+        if img_back.shape[-1] == 3:
+            if self.bg_remover is None:
+                self.bg_remover = rembg.new_session()
+            img_back = rembg.remove(img_back, session=self.bg_remover)
 
         img = cv2.resize(
             img, (self.W, self.H), interpolation=cv2.INTER_AREA
         )
         img = img.astype(np.float32) / 255.0
+        
+        img_back = cv2.resize(
+            img_back, (self.W, self.H), interpolation=cv2.INTER_AREA
+        )
+        img_back = img_back.astype(np.float32) / 255.0
 
         self.input_mask = img[..., 3:]
+        self.input_mask_back = img_back[..., 3:]
         # white bg
         self.input_img = img[..., :3] * self.input_mask + (
             1 - self.input_mask
         )
+        self.input_img_back = img_back[..., :3] * self.input_mask_back + (
+            1 - self.input_mask_back
+        )
         # bgr to rgb
         self.input_img = self.input_img[..., ::-1].copy()
+        self.input_img_back = self.input_img_back[..., ::-1].copy()
 
         # load prompt
         file_prompt = file.replace("_rgba.png", "_caption.txt")

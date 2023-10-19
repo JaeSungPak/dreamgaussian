@@ -176,6 +176,8 @@ class GUI:
                 self.input_img_back = F.interpolate(self.input_img_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
                 self.input_mask_back = self.input_img_back[..., 3:]
                 self.input_mask_back = F.interpolate(self.input_mask_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
+                
+                save_image(self.input_img_back, f"data/back.png")
 
     def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
