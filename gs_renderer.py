@@ -727,6 +727,7 @@ class Renderer:
         override_color=None,
         compute_cov3D_python=False,
         convert_SHs_python=False,
+        main_1 = False
     ):
         # Create zero tensor. We will use it to make pytorch return gradients of the 2D (screen-space) means
         screenspace_points = (
@@ -804,9 +805,10 @@ class Renderer:
                 
         else:
             colors_precomp = override_color
-        
-        mean_recenter = means3D - means3D.max()
-        shs = shs + mean_recenter.view(-1, 1, 3) * ((500 - iter) / 500)
+            
+        if main_1:
+            mean_recenter = means3D - means3D.max()
+            shs = shs + mean_recenter.view(-1, 1, 3) * ((500 - iter) / 500)
         
         # Rasterize visible Gaussians to image, obtain their radii (on screen).
         rendered_image, radii, rendered_depth, rendered_alpha = rasterizer(
