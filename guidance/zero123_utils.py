@@ -6,6 +6,7 @@ from diffusers import (
     StableDiffusionPipeline,
 )
 import torchvision.transforms.functional as TF
+import torchvision.transforms as transforms
 
 import numpy as np
 import torch
@@ -16,12 +17,15 @@ import sys
 sys.path.append('./')
 
 from zero123 import Zero123Pipeline
+from torchvision.utils import save_image
 
 
 class Zero123(nn.Module):
     def __init__(self, device, fp16=True, t_range=[0.02, 0.98]):
         super().__init__()
-
+        
+        self.step = 0
+        self.frames = []
         self.device = device
         self.fp16 = fp16
         self.dtype = torch.float16 if fp16 else torch.float32
@@ -162,10 +166,22 @@ class Zero123(nn.Module):
         grad = torch.nan_to_num(grad)
 
         target = (latents - grad).detach()
+        if self.step % 10 == 0:
+            save_image(self.decode_latents(target.to(torch.float16)), f"data/zero_render_{self.step}.png")
+        
         loss = 0.5 * F.mse_loss(latents.float(), target, reduction='sum')
+        
+        self.step = self.step + 1
+        
+        target_ = target.type(torch.HalfTensor).cuda()
+        t_img = self.decode_latents(target_)
+        latents_ = latents.type(torch.HalfTensor).cuda()
+        l_img = self.decode_latents(latents_)
+        ln_img = self.decode_latents(latents_noisy.type(torch.HalfTensor).cuda())
+        self.frames.append(np.array(transforms.ToPILImage()(torch.cat((l_img.detach()[0].cpu(),ln_img.detach()[0].cpu(),t_img.detach()[0].cpu()),2))))
 
         return loss
-    
+        
 
     def decode_latents(self, latents):
         latents = 1 / self.vae.config.scaling_factor * latents

@@ -15,6 +15,11 @@ from gs_renderer import Renderer, MiniCam
 
 from grid_put import mipmap_linear_grid_put_2d
 from mesh import Mesh, safe_normalize
+from torch.utils.tensorboard import SummaryWriter
+from torchvision.utils import save_image
+
+        
+writer = SummaryWriter('scalar/')
 
 class GUI:
     def __init__(self, opt):
@@ -25,7 +30,7 @@ class GUI:
         self.cam = OrbitCamera(opt.W, opt.H, r=opt.radius, fovy=opt.fovy)
 
         self.mode = "image"
-        self.seed = "random"
+        self.seed = "10000"
 
         self.buffer_image = np.ones((self.W, self.H, 3), dtype=np.float32)
         self.need_update = True  # update buffer_image
@@ -47,7 +52,9 @@ class GUI:
         # input image
         self.input_img = None
         self.input_mask = None
+        self.input_mask_back = None
         self.input_img_torch = None
+        self.input_img_back = None
         self.input_mask_torch = None
         self.overlay_input_img = False
         self.overlay_input_img_ratio = 0.5
@@ -113,8 +120,18 @@ class GUI:
 
         # default camera
         pose = orbit_camera(self.opt.elevation, 0, self.opt.radius)
+        pose_back = orbit_camera(self.opt.elevation, 180, self.opt.radius)
         self.fixed_cam = MiniCam(
             pose,
+            self.opt.ref_size,
+            self.opt.ref_size,
+            self.cam.fovy,
+            self.cam.fovx,
+            self.cam.near,
+            self.cam.far,
+        )
+        self.fixed_cam_back = MiniCam(
+            pose_back,
             self.opt.ref_size,
             self.opt.ref_size,
             self.cam.fovy,
@@ -155,8 +172,12 @@ class GUI:
 
             if self.enable_zero123:
                 self.guidance_zero123.get_img_embeds(self.input_img_torch)
+                self.input_img_back = self.guidance_zero123.refine(self.input_img_torch,[180],[0],[0])
+                self.input_img_back = F.interpolate(self.input_img_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
+                self.input_mask_back = self.input_img_back[..., 3:]
+                self.input_mask_back = F.interpolate(self.input_mask_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False)
 
-    def train_step(self):
+    def train_step(self, iter_num, iters):
         starter = torch.cuda.Event(enable_timing=True)
         ender = torch.cuda.Event(enable_timing=True)
         starter.record()
@@ -174,15 +195,34 @@ class GUI:
             ### known view
             if self.input_img_torch is not None:
                 cur_cam = self.fixed_cam
-                out = self.renderer.render(cur_cam)
+                out = self.renderer.render(cur_cam, iter=iter_num, main_1=True)
+                back_cam = self.fixed_cam_back
+                out_back = self.renderer.render(back_cam, iter=iter_num, main_1=True)
 
                 # rgb loss
                 image = out["image"].unsqueeze(0) # [1, 3, H, W] in [0, 1]
-                loss = loss + 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
+                # image_back = out_back["image"].unsqueeze(0)
+                
+                loss_image = 10000 * step_ratio * F.mse_loss(image, self.input_img_torch)
+                
+                # loss_image_back = 10000 * step_ratio * F.mse_loss(image_back.float(), self.input_img_back.float())
+                
+                # loss = loss + loss_image + loss_image_back
+                loss = loss + loss_image
+                
+                writer.add_scalar("Loss/image", loss_image, iter_num)
 
                 # mask loss
                 mask = out["alpha"].unsqueeze(0) # [1, 1, H, W] in [0, 1]
-                loss = loss + 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
+                #mask_back = out_back["alpha"].unsqueeze(0)
+                
+                loss_alpha = 1000 * step_ratio * F.mse_loss(mask, self.input_mask_torch)
+                
+                #loss_alpha_back = 1000 * step_ratio * F.mse_loss(mask_back.float(), self.input_mask_back.float())
+                
+                loss = loss + loss_alpha
+                
+                writer.add_scalar("Loss/alpha", loss_alpha, iter_num)
 
             ### novel view (manual batch)
             render_resolution = 128 if step_ratio < 0.3 else (256 if step_ratio < 0.6 else 512)
@@ -191,6 +231,7 @@ class GUI:
             # avoid too large elevation (> 80 or < -80), and make sure it always cover [-30, 30]
             min_ver = max(min(-30, -30 - self.opt.elevation), -80 - self.opt.elevation)
             max_ver = min(max(30, 30 - self.opt.elevation), 80 - self.opt.elevation)
+            
             for _ in range(self.opt.batch_size):
 
                 # render random view
@@ -215,7 +256,7 @@ class GUI:
                 )
 
                 invert_bg_color = np.random.rand() > self.opt.invert_bg_prob
-                out = self.renderer.render(cur_cam, invert_bg_color=invert_bg_color)
+                out = self.renderer.render(cur_cam, iter_num, invert_bg_color=invert_bg_color, main_1=True)
 
                 image = out["image"].unsqueeze(0)# [1, 3, H, W] in [0, 1]
                 images.append(image)
@@ -231,7 +272,9 @@ class GUI:
                 loss = loss + self.opt.lambda_sd * self.guidance_sd.train_step(images, step_ratio)
 
             if self.enable_zero123:
-                loss = loss + self.opt.lambda_zero123 * self.guidance_zero123.train_step(images, vers, hors, radii, step_ratio)
+                loss_sds = self.opt.lambda_zero123 * self.guidance_zero123.train_step(images, vers, hors, radii, step_ratio)
+                loss = loss + loss_sds
+                writer.add_scalar("Loss/sds", loss_sds, iter_num)
             
             # optimize step
             loss.backward()
@@ -352,7 +395,7 @@ class GUI:
 
         img = cv2.resize(img, (self.W, self.H), interpolation=cv2.INTER_AREA)
         img = img.astype(np.float32) / 255.0
-
+        
         self.input_mask = img[..., 3:]
         # white bg
         self.input_img = img[..., :3] * self.input_mask + (1 - self.input_mask)
@@ -847,17 +890,29 @@ class GUI:
             # update texture every frame
             if self.training:
                 self.train_step()
+                
+            import moviepy.editor as mpy
+            clip = mpy.ImageSequenceClip(self.guidance_zero123.frames,fps=10)
+            clip.write_videofile("compare.mp4",fps=10)
             self.test_step()
             dpg.render_dearpygui_frame()
     
     # no gui mode
     def train(self, iters=500):
+    
+        print(f"batch_size: {self.opt.batch_size}, iters: {opt.iters}, train_step: {self.train_steps}")
+        
         if iters > 0:
             self.prepare_train()
             for i in tqdm.trange(iters):
-                self.train_step()
+                self.train_step(i, iters)
+            import moviepy.editor as mpy
+            clip = mpy.ImageSequenceClip(self.guidance_zero123.frames,fps=10)
+            clip.write_videofile("compare.mp4",fps=10)
             # do a last prune
             self.renderer.gaussians.prune(min_opacity=0.01, extent=1, max_screen_size=1)
+            
+            writer.close()
         # save
         self.save_model(mode='model')
         self.save_model(mode='geo+tex')

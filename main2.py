@@ -25,7 +25,7 @@ class GUI:
         self.cam = OrbitCamera(opt.W, opt.H, r=opt.radius, fovy=opt.fovy)
 
         self.mode = "image"
-        self.seed = "random"
+        self.seed = "77777"
 
         self.buffer_image = np.ones((self.W, self.H, 3), dtype=np.float32)
         self.need_update = True  # update buffer_image
@@ -163,7 +163,8 @@ class GUI:
                 ssaa = min(2.0, max(0.125, 2 * np.random.random()))
                 out = self.renderer.render(*self.fixed_cam, self.opt.ref_size, self.opt.ref_size, ssaa=ssaa)
 
-                # rgb loss
+                # rgb
+                
                 image = out["image"] # [H, W, 3] in [0, 1]
                 valid_mask = ((out["alpha"] > 0) & (out["viewcos"] > 0.5)).detach()
                 loss = loss + F.mse_loss(image * valid_mask, self.input_img_torch_channel_last * valid_mask)
