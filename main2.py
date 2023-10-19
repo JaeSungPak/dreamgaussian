@@ -134,6 +134,11 @@ class GUI:
             self.input_img_torch = F.interpolate(
                 self.input_img_torch, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False
             )
+            
+            self.input_img_torch_back = torch.from_numpy(self.input_img_back).permute(2, 0, 1).unsqueeze(0).to(self.device)
+            self.input_img_torch_back = F.interpolate(
+                self.input_img_torch_back, (self.opt.ref_size, self.opt.ref_size), mode="bilinear", align_corners=False
+            )
 
             self.input_mask_torch = torch.from_numpy(self.input_mask).permute(2, 0, 1).unsqueeze(0).to(self.device)
             self.input_mask_torch = F.interpolate(
