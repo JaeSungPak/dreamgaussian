@@ -8,7 +8,7 @@ mesh:
 # estimated elevation angle for input image 
 elevation: 0
 # reference image resolution
-ref_size: 256
+ref_size: 512
 # density thresh for mesh extraction
 density_thresh: 1
 
@@ -61,7 +61,7 @@ percent_dense: 0.1
 density_start_iter: 1000
 density_end_iter: 30000
 densification_interval: 1000
-opacity_reset_interval: 4500
+opacity_reset_interval: 7000
 densify_grad_threshold: 0.5
 
 ### Textured Mesh
