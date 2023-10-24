@@ -64,6 +64,8 @@ if __name__ == '__main__':
         print(f'[INFO] background removal...')
         carved_image = rembg.remove(image, session=session) # [H, W, 4]
         mask = carved_image[..., -1] > 0
+        
+        save_image(carved_image, f"data/rembg_image.png")
 
         # recenter
         if opt.recenter:
