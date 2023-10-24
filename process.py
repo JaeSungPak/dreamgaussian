@@ -66,8 +66,6 @@ if __name__ == '__main__':
         carved_image = rembg.remove(image, session=session) # [H, W, 4]
         mask = carved_image[..., -1] > 0
         
-        print(f"shape: {carved_image.shape}")
-
         # recenter
         if opt.recenter:
             print(f'[INFO] recenter...')
