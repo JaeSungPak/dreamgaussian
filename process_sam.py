@@ -83,7 +83,6 @@ if __name__ == '__main__':
         download_checkpoint("https://huggingface.co/One-2-3-45/code/resolve/main/sam_vit_h_4b8939.pth", "sam_vit_h_4b8939.pth")
     
     for file in files:
-
         out_base = os.path.basename(file).split('.')[0]
         out_rgba = os.path.join(out_dir, out_base + '_rgba.png')
 
@@ -97,7 +96,10 @@ if __name__ == '__main__':
         
         predictor = sam_init(0)
         input_raw = Image.open(opt.path)
-        carved_image = np.asarray(preprocess(predictor, input_raw))
+        sam_image = np.asarray(preprocess(predictor, input_raw))
+        
+        sam_reso = (sam_image.shape[0], sam_image.shape[1])
+        carved_image = np.concatenate((sam_image, np.ones(sam_reso),axis=2)
         
         mask = carved_image[..., -1] > 0
         
