@@ -40,7 +40,6 @@ def preprocess(predictor, raw_im, lower_contrast=False):
     torch.cuda.empty_cache()
     return input_256
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -52,11 +51,6 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     session = rembg.new_session(model_name=opt.model)
-    
-    predictor = sam_init(0)
-    input_raw = Image.open(opt.path)
-    
-    input_256 = preprocess(predictor, input_raw)
 
     if os.path.isdir(opt.path):
         print(f'[INFO] processing directory {opt.path}...')
@@ -77,7 +71,12 @@ if __name__ == '__main__':
         
         # carve background
         print(f'[INFO] background removal...')
-        carved_image = rembg.remove(image, session=session) # [H, W, 4]
+        # carved_image = rembg.remove(image, session=session) # [H, W, 4]
+        
+        predictor = sam_init(0)
+        input_raw = Image.open(opt.path)
+        carved_image = preprocess(predictor, input_raw)
+        
         mask = carved_image[..., -1] > 0
         
         # recenter
