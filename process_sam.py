@@ -14,7 +14,7 @@ from PIL import Image
 import rembg
 from torchvision.utils import save_image
 from guidance.sam_utils import sam_init, sam_out_nosave
-from guidance.utils import pred_bbox
+from guidance.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
 
 class BLIP2():
     def __init__(self, device='cuda'):
