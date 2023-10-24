@@ -16,6 +16,9 @@ from torchvision.utils import save_image
 from guidance.sam_utils import sam_init, sam_out_nosave
 from guidance.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
 
+import urllib.request
+from tqdm import tqdm
+
 class BLIP2():
     def __init__(self, device='cuda'):
         self.device = device
@@ -39,6 +42,22 @@ def preprocess(predictor, raw_im, lower_contrast=False):
     input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
     torch.cuda.empty_cache()
     return input_256
+    
+def download_checkpoint(url, save_path):
+    try:
+        with urllib.request.urlopen(url) as response, open(save_path, 'wb') as file:
+            file_size = int(response.info().get('Content-Length', -1))
+            chunk_size = 8192
+            num_chunks = file_size // chunk_size if file_size > chunk_size else 1
+
+            with tqdm(total=file_size, unit='B', unit_scale=True, desc='Downloading', ncols=100) as pbar:
+                for chunk in iter(lambda: response.read(chunk_size), b''):
+                    file.write(chunk)
+                    pbar.update(len(chunk))
+        
+        print(f"Checkpoint downloaded and saved to: {save_path}")
+    except Exception as e:
+        print(f"Error downloading checkpoint: {e}")
 
 if __name__ == '__main__':
 
@@ -59,6 +78,9 @@ if __name__ == '__main__':
     else: # isfile
         files = [opt.path]
         out_dir = os.path.dirname(opt.path)
+        
+    if not path.exists("sam_vit_h_4b8939.pth"):
+        download_checkpoint("https://huggingface.co/One-2-3-45/code/resolve/main/sam_vit_h_4b8939.pth", "sam_vit_h_4b8939.pth")
     
     for file in files:
 
