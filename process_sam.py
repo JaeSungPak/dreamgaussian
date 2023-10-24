@@ -79,7 +79,7 @@ if __name__ == '__main__':
         files = [opt.path]
         out_dir = os.path.dirname(opt.path)
         
-    if not path.exists("sam_vit_h_4b8939.pth"):
+    if not os.path.exists("sam_vit_h_4b8939.pth"):
         download_checkpoint("https://huggingface.co/One-2-3-45/code/resolve/main/sam_vit_h_4b8939.pth", "sam_vit_h_4b8939.pth")
     
     for file in files:
