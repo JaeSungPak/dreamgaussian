@@ -96,10 +96,8 @@ if __name__ == '__main__':
         
         predictor = sam_init(0)
         input_raw = Image.open(opt.path)
-        sam_image = np.asarray(preprocess(predictor, input_raw))
-
-        alpha = np.zeros((sam_image.shape[0], sam_image.shape[1], 1))
-        carved_image = np.concatenate((sam_image, alpha), axis=2)
+        carved_image = np.asarray(preprocess(predictor, input_raw))
+        carved_image = cv2.cvtColor(carved_image, cv2.COLOR_RGBA2BGRA)
         
         mask = carved_image[..., -1] > 0
         
