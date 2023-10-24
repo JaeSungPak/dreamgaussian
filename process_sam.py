@@ -39,9 +39,9 @@ class BLIP2():
 def preprocess(predictor, raw_im, lower_contrast=False):
     raw_im.thumbnail([1024, 1024], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
-    input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
+    # input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
     torch.cuda.empty_cache()
-    return input_256
+    return image_sam
     
 def download_checkpoint(url, save_path):
     try:
@@ -92,14 +92,14 @@ if __name__ == '__main__':
         
         # carve background
         print(f'[INFO] background removal...')
-        carved_image = rembg.remove(image, session=session) # [H, W, 4]
+        #carved_image = rembg.remove(image, session=session) # [H, W, 4]
         
-        # predictor = sam_init(0)
-        # input_raw = Image.open(opt.path)
-        # sam_image = np.asarray(preprocess(predictor, input_raw))
+        predictor = sam_init(0)
+        input_raw = Image.open(opt.path)
+        sam_image = np.asarray(preprocess(predictor, input_raw))
 
-        # alpha = np.zeros((sam_image.shape[0], sam_image.shape[1], 1))
-        # carved_image = np.concatenate((sam_image, alpha), axis=2)
+        alpha = np.zeros((sam_image.shape[0], sam_image.shape[1], 1))
+        carved_image = np.concatenate((sam_image, alpha), axis=2)
         
         mask = carved_image[..., -1] > 0
         
