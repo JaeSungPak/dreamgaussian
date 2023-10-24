@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
-import rembg
+# import rembg
 from torchvision.utils import save_image
 from guidance.sam_utils import sam_init, sam_out_nosave
 from guidance.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
@@ -34,7 +34,7 @@ class BLIP2():
         return generated_text
         
 def preprocess(predictor, raw_im, lower_contrast=False):
-    raw_im.thumbnail([512, 512], Image.Resampling.LANCZOS)
+    raw_im.thumbnail([1024, 1024], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
     input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
     torch.cuda.empty_cache()
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--recenter', type=bool, default=True, help="recenter, potentially not helpful for multiview zero123")    
     opt = parser.parse_args()
 
-    session = rembg.new_session(model_name=opt.model)
+    # session = rembg.new_session(model_name=opt.model)
 
     if os.path.isdir(opt.path):
         print(f'[INFO] processing directory {opt.path}...')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         
         predictor = sam_init(0)
         input_raw = Image.open(opt.path)
-        carved_image = preprocess(predictor, input_raw)
+        carved_image = np.asarray(preprocess(predictor, input_raw))
         
         mask = carved_image[..., -1] > 0
         
