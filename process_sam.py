@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
-# import rembg
+import rembg
 from torchvision.utils import save_image
 from guidance.sam_utils import sam_init, sam_out_nosave
 from guidance.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
@@ -92,14 +92,14 @@ if __name__ == '__main__':
         
         # carve background
         print(f'[INFO] background removal...')
-        # carved_image = rembg.remove(image, session=session) # [H, W, 4]
+        carved_image = rembg.remove(image, session=session) # [H, W, 4]
         
-        predictor = sam_init(0)
-        input_raw = Image.open(opt.path)
-        sam_image = np.asarray(preprocess(predictor, input_raw))
-        
-        alpha = np.zeros((sam_image.shape[0], sam_image.shape[1], 1))
-        carved_image = np.concatenate((sam_image, alpha), axis=2)
+        # predictor = sam_init(0)
+        # input_raw = Image.open(opt.path)
+        # sam_image = np.asarray(preprocess(predictor, input_raw))
+
+        # alpha = np.zeros((sam_image.shape[0], sam_image.shape[1], 1))
+        # carved_image = np.concatenate((sam_image, alpha), axis=2)
         
         mask = carved_image[..., -1] > 0
         

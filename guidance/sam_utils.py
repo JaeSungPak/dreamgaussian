@@ -47,4 +47,4 @@ def sam_out_nosave(predictor, input_image, *bbox_sliders):
     out_image[:, :, 3] = mask.astype(np.uint8) * 255
     out_image_bbox[:, :, 3] = masks_bbox[-1].astype(np.uint8) * 255 # np.argmax(scores_bbox)
     torch.cuda.empty_cache()
-    return Image.fromarray(out_image_bbox, mode='RGBA') 
+    return Image.fromarray(out_image_bbox, mode='RGBA'), mask

@@ -47,7 +47,7 @@ def convert_mesh_format(exp_dir, output_format=".obj"):
     return mesh_path
 
 # contrast correction, rescale and recenter
-def image_preprocess_nosave(input_image, lower_contrast=True, rescale=True):
+def image_preprocess_nosave(input_image, lower_contrast=True, rescale=True, scale=1024):
 
     image_arr = np.array(input_image)
     in_w, in_h = image_arr.shape[:2]
@@ -70,7 +70,7 @@ def image_preprocess_nosave(input_image, lower_contrast=True, rescale=True):
     padded_image = np.zeros((side_len, side_len, 4), dtype=np.uint8)
     center = side_len//2
     padded_image[center-h//2:center-h//2+h, center-w//2:center-w//2+w] = image_arr[y:y+h, x:x+w]
-    rgba = Image.fromarray(padded_image).resize((256, 256), Image.LANCZOS)
+    rgba = Image.fromarray(padded_image).resize(scale, scale), Image.LANCZOS)
 
     rgba_arr = np.array(rgba) / 255.0
     rgb = rgba_arr[...,:3] * rgba_arr[...,-1:] + (1 - rgba_arr[...,-1:])
@@ -131,7 +131,7 @@ def gen_poses(shape_dir, pose_est):
     img_ids, input_poses = get_poses(pose_est)
         
     out_dict = {}
-    focal = 560/2; h = w = 256
+    focal = 560/2; h = w = 1024
     out_dict['intrinsics'] = [[focal, 0, w / 2], [0, focal, h / 2], [0, 0, 1]]
     out_dict['near_far'] = [1.2-0.7, 1.2+0.6]
     out_dict['c2ws'] = {}
