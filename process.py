@@ -66,7 +66,7 @@ if __name__ == '__main__':
         carved_image = rembg.remove(image, session=session) # [H, W, 4]
         mask = carved_image[..., -1] > 0
         
-        # save_image(np.ndarray(carved_image), f"data/rembg_image.png")
+        save_image(np.transpose(carved_image, (2, 0, 1)), f"data/rembg_image.png")
 
         # recenter
         if opt.recenter:
