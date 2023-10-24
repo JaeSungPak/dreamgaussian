@@ -99,7 +99,7 @@ if __name__ == '__main__':
         sam_image = np.asarray(preprocess(predictor, input_raw))
         
         alpha = np.ones(sam_image.shape[0], sam_image.shape[1], 1)
-        carved_image = np.concatenate((sam_image, alpha)),axis=2)
+        carved_image = np.concatenate((sam_image, alpha), axis=2)
         
         mask = carved_image[..., -1] > 0
         
