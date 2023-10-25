@@ -39,9 +39,9 @@ class BLIP2():
 def preprocess(predictor, raw_im, lower_contrast=False):
     raw_im.thumbnail([1024, 1024], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
-    # input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
+    input_256 = image_preprocess_nosave(image_sam, lower_contrast=lower_contrast, rescale=True)
     torch.cuda.empty_cache()
-    return image_sam
+    return input_256
     
 def download_checkpoint(url, save_path):
     try:
@@ -102,27 +102,8 @@ if __name__ == '__main__':
         mask = carved_image[..., -1] > 0
         
         # recenter
-        if opt.recenter:
-            print(f'[INFO] recenter...')
-            final_rgba = np.zeros((opt.size, opt.size, 4), dtype=np.uint8)
-            
-            coords = np.nonzero(mask)
-            x_min, x_max = coords[0].min(), coords[0].max()
-            y_min, y_max = coords[1].min(), coords[1].max()
-            h = x_max - x_min
-            w = y_max - y_min
-            desired_size = int(opt.size * (1 - opt.border_ratio))
-            scale = desired_size / max(h, w)
-            h2 = int(h * scale)
-            w2 = int(w * scale)
-            x2_min = (opt.size - h2) // 2
-            x2_max = x2_min + h2
-            y2_min = (opt.size - w2) // 2
-            y2_max = y2_min + w2
-            final_rgba[x2_min:x2_max, y2_min:y2_max] = cv2.resize(carved_image[x_min:x_max, y_min:y_max], (w2, h2), interpolation=cv2.INTER_AREA)
-            
-        else:
-            final_rgba = carved_image
+       
+        final_rgba = carved_image
         
         # write image
         cv2.imwrite(out_rgba, final_rgba)
