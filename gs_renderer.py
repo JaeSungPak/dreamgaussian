@@ -726,8 +726,7 @@ class Renderer:
         invert_bg_color=False,
         override_color=None,
         compute_cov3D_python=False,
-        convert_SHs_python=False,
-        main_1=False
+        convert_SHs_python=False
     ):
         # Create zero tensor. We will use it to make pytorch return gradients of the 2D (screen-space) means
         screenspace_points = (

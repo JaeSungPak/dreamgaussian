@@ -161,7 +161,7 @@ class GUI:
             if self.input_img_torch is not None:
 
                 ssaa = min(2.0, max(0.125, 2 * np.random.random()))
-                out = self.renderer.render(*self.fixed_cam, self.opt.ref_size, self.opt.ref_size, ssaa=ssaa)
+                out = self.renderer.render(*self.fixed_cam, self.step, self.opt.ref_size, self.opt.ref_size, ssaa=ssaa)
 
                 # rgb
                 
@@ -191,7 +191,7 @@ class GUI:
 
                 # random render resolution
                 ssaa = min(2.0, max(0.125, 2 * np.random.random()))
-                out = self.renderer.render(pose, self.cam.perspective, render_resolution, render_resolution, ssaa=ssaa)
+                out = self.renderer.render(pose, self.step, self.cam.perspective, render_resolution, render_resolution, ssaa=ssaa)
 
                 image = out["image"] # [H, W, 3] in [0, 1]
                 image = image.permute(2,0,1).contiguous().unsqueeze(0) # [1, 3, H, W] in [0, 1]
@@ -258,7 +258,7 @@ class GUI:
         if self.need_update:
             # render image
 
-            out = self.renderer.render(self.cam.pose, self.cam.perspective, self.H, self.W)
+            out = self.renderer.render(self.cam.pose, 0, self.cam.perspective, self.H, self.W)
 
             buffer_image = out[self.mode]  # [H, W, 3]
 
