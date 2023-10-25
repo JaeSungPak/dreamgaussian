@@ -805,8 +805,12 @@ class Renderer:
         else:
             colors_precomp = override_color
         
-        mean_recenter = means3D - means3D.max()
-        shs = shs + mean_recenter.view(-1, 1, 3)
+        if iter > -1:
+            mean_recenter = means3D - means3D.max()
+            shs = shs + mean_recenter.view(-1, 1, 3) * (500 - iter) / 500
+        else:
+            mean_recenter = means3D - means3D.max()
+            shs = shs + mean_recenter.view(-1, 1, 3)
         
         # Rasterize visible Gaussians to image, obtain their radii (on screen).
         rendered_image, radii, rendered_depth, rendered_alpha = rasterizer(
